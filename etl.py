@@ -20,13 +20,13 @@ def process_song_file(cur, filepath):
     # insert song record
     song_data = df[['song_id', 'title',
                     'artist_id', 'year', 'duration']].values[0]
-    print('song_data = ', song_data)
+
     cur.execute(song_table_insert, song_data)
 
     # insert artist record
     artist_data = df[['artist_id', 'artist_name', 'artist_location',
                       'artist_latitude', 'artist_longitude']].values[0]
-    print('artist_data = ', artist_data)
+
     cur.execute(artist_table_insert, artist_data)
 
 
@@ -67,6 +67,8 @@ def process_log_file(cur, filepath):
     for i, row in user_df.iterrows():
         cur.execute(user_table_insert, row)
 
+    songplay_data = []
+
     # insert songplay records
     for index, row in df.iterrows():
 
@@ -80,9 +82,10 @@ def process_log_file(cur, filepath):
             songid, artistid = None, None
 
         # insert songplay record
-        songplay_data = songplay_data = [
-            row.ts, row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent]
-        cur.execute(songplay_table_insert, songplay_data)
+        songplay_data.append((
+            row.ts, row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent))
+
+    cur.executemany(songplay_table_insert, tuple(songplay_data))
 
 
 def process_data(cur, conn, filepath, func):
