@@ -20,6 +20,8 @@ CREATE TABLE songplays (
     location varchar(200),
     user_agent varchar(200),
     FOREIGN KEY (start_time) REFERENCES time (start_time),
+    FOREIGN KEY (artist_id) REFERENCES artists (artist_id),
+    FOREIGN KEY (song_id) REFERENCES songs (song_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 """)
@@ -40,8 +42,7 @@ CREATE TABLE songs (
     title varchar(100),
     artist_id varchar(100), 
     year int, 
-    duration float,
-    FOREIGN KEY (artist_id) REFERENCES artists (artist_id)
+    duration float
 );
 """)
 
