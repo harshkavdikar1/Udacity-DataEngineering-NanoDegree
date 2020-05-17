@@ -34,7 +34,23 @@ CREATE TABLE staging_event (
 
 staging_songs_table_create = ("""
 CREATE TABLE staging_songs (
-
+    artist varchar(100),
+    auth varchar(20),
+    first_name varchar(200),
+    gender char(1),
+    item_in_session int,
+    last_name varchar(200),
+    level varchar(10),
+    location varchar(200),
+    method varchar(10),
+    page varchar(100),
+    registration varchar(20),
+    session_id int,
+    song varchar(200),
+    status smallint,
+    ts timestamp,
+    user_agent varchar(200),
+    user_id varchar(10)
 );
 """)
 
