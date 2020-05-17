@@ -19,7 +19,16 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 
 staging_events_table_create= ("""
 CREATE TABLE staging_event (
-
+    num_songs int,
+    artist_id varchar(100),
+    artist_latitude varchar(10),
+    artist_longitude varchar(10),
+    artist_location varchar(200),
+    artist_name varchar(200),
+    song_id varchar(100),
+    title varchar(100),
+    duration float,
+    year int
 );    
 """)
 
@@ -82,9 +91,9 @@ artist_table_create = ("""
 CREATE TABLE artists (
     artist_id varchar(100) NOT NULL SORTKEY,
     name varchar(200) NOT NULL,
-    location varchar(200) NOT NULL,
-    latitude varchar(20) NOT NULL,
-    longitude varchar(20) NOT NULL,
+    location varchar(200),
+    latitude varchar(20),
+    longitude varchar(20),
 )
 DISTSTYLE ALL;
 """)
