@@ -34,19 +34,20 @@ CREATE TABLE staging_event (
 
 staging_songs_table_create = ("""
 CREATE TABLE staging_songs (
-    artist varchar(100),
+    artist varchar(200),
     auth varchar(20),
     first_name varchar(200),
     gender char(1),
     item_in_session int,
     last_name varchar(200),
+    length float,
     level varchar(10),
     location varchar(200),
     method varchar(10),
     page varchar(100),
     registration varchar(20),
     session_id int,
-    song varchar(200),
+    song varchar(100),
     status smallint,
     ts timestamp,
     user_agent varchar(200),
@@ -126,7 +127,7 @@ CREATE TABLE time (
     week smallint NOT NULL,
     month smallint NOT NULL,
     year int NOT NULL,
-    weekday varchar(10) NOT NULL
+    weekday int NOT NULL
 )
 DISTSTYLE AUTO;
 """)
@@ -144,31 +145,48 @@ staging_songs_copy = ("""
 songplay_table_insert = ("""
 INSERT INTO songplays (
     start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
-values (%s, %s, %s, %s, %s, %s, %s, %s)
+SELECT to_timestamp(ts), user_id, level, song_id, artist_id, session_id, location, user_agent 
+FROM staging_songs s
+LEFT OUTER JOIN staging_event e
+ON e.title = s.song 
+AND e.name = s.artist 
+AND e.duration = s.length
 """)
 
 user_table_insert = ("""
 INSERT INTO users (
     user_id, first_name, last_name, gender, level)
-values (%s, %s, %s, %s, %s)
+SELECT user_id, first_name, last_name, gender, level 
+FROM staging_songs;
 """)
 
 song_table_insert = ("""
 INSERT INTO songs (
     song_id, title, artist_id, year, duration) 
-values (%s, %s, %s, %s, %s)
+SELECT song_id, title, artist_id, year, duration 
+FROM staging_events;
 """)
 
 artist_table_insert = ("""
 INSERT INTO artists (
     artist_id, name, location, latitude, longitude) 
-values (%s, %s, %s, %s, %s)
+SELECT artist_id, artist_name, artist_location, artist_latitude, artist_location
+FROM staging_events;
 """)
 
 time_table_insert = ("""
 INSERT INTO time (
     start_time, hour, day, week, month, year, weekday)
-values (%s, %s, %s, %s, %s, %s, %s)
+SELECT start_time,
+EXTRACT (hour FROM start_time),
+EXTRACT (day FROM start_time),
+EXTRACT (week FROM start_time),
+EXTRACT (month FROM start_time),
+EXTRACT (year FROM start_time),
+EXTRACT (dow FROM start_time)
+FROM (
+    SELECT to_timestamp(ts) as start_time FROM staging_events
+)
 """)
 
 # QUERY LISTS
