@@ -18,7 +18,7 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 # CREATE TABLES
 
 staging_events_table_create= ("""
-CREATE TABLE staging_event (
+CREATE TABLE staging_events (
     num_songs int,
     artist_id varchar(100),
     artist_latitude varchar(10),
@@ -135,10 +135,18 @@ DISTSTYLE AUTO;
 # STAGING TABLES
 
 staging_events_copy = ("""
-""").format()
+COPY staging_events FROM {}
+CREDENTIALS 'aws_iam_role={}'
+region 'us-west-2';
+""").format(config['S3']['LOG_DATA'], config['IAM_ROLE']['ARN'])
 
 staging_songs_copy = ("""
-""").format()
+COPY staging_songs FROM {}
+CREDENTIALS 'aws_iam_role={}'
+region 'us-west-2';
+format as JSON {}
+timeformat as 'epochmillisecs'
+""").format(config['S3']['SONG_DATA'], config['IAM_ROLE']['ARN'], config['S3']['LOG_JSONPATH'])
 
 # FINAL TABLES
 
@@ -147,7 +155,7 @@ INSERT INTO songplays (
     start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
 SELECT to_timestamp(ts), user_id, level, song_id, artist_id, session_id, location, user_agent 
 FROM staging_songs s
-LEFT OUTER JOIN staging_event e
+LEFT OUTER JOIN staging_events e
 ON e.title = s.song 
 AND e.name = s.artist 
 AND e.duration = s.length
