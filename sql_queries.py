@@ -18,22 +18,7 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 # CREATE TABLES
 
 staging_events_table_create= ("""
-CREATE TABLE staging_events (
-    num_songs int,
-    artist_id varchar(100),
-    artist_latitude decimal,
-    artist_longitude decimal,
-    artist_location varchar(200),
-    artist_name varchar(200),
-    song_id varchar(100),
-    title varchar(100),
-    duration decimal,
-    year int
-);    
-""")
-
-staging_songs_table_create = ("""
-CREATE TABLE staging_songs (
+CREATE TABLE IF NOT EXISTS staging_events (
     artist varchar(200),
     auth varchar(20),
     first_name varchar(200),
@@ -49,16 +34,31 @@ CREATE TABLE staging_songs (
     session_id int,
     song varchar(200),
     status smallint,
-    ts timestamp,
+    ts bigint,
     user_agent varchar(200),
     user_id varchar(10)
+);    
+""")
+
+staging_songs_table_create = ("""
+CREATE TABLE IF NOT EXISTS staging_songs (
+    num_songs int,
+    artist_id varchar(100),
+    artist_latitude decimal,
+    artist_longitude decimal,
+    artist_location varchar(200),
+    artist_name varchar(200),
+    song_id varchar(100),
+    title varchar(100),
+    duration decimal,
+    year int
 );
 """)
 
 
 # To match with the table time we have start time as distkey
 songplay_table_create = ("""
-CREATE TABLE songplays (
+CREATE TABLE IF NOT EXISTS songplays (
     songplay_id bigint IDENTITY(0,1),
     start_time timestamp NOT NULL,
     user_id varchar(10) NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE songplays (
 # as SORTKEY and DISTTYLE as ALL, we want it to be loaded to all slices without distributing when 
 # performing analytics
 user_table_create = ("""
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     user_id varchar(10) NOT NULL SORTKEY,
     first_name varchar(200),
     last_name varchar(200),
@@ -90,7 +90,7 @@ CREATE TABLE users (
 # as SORTKEY and DISTTYLE as ALL, we want it to be loaded to all slices without distributing when 
 # performing analytics
 song_table_create = ("""
-CREATE TABLE songs (
+CREATE TABLE IF NOT EXISTS songs (
     song_id varchar(100) NOT NULL SORTKEY,
     title varchar(100) NOT NULL,
     artist_id varchar(100) NOT NULL,
@@ -105,7 +105,7 @@ DISTSTYLE ALL;
 # we have artist_id as SORTKEY with DISTSTYLE as ALL, we want it to be loaded to all slices 
 # without distributing when performing analytics
 artist_table_create = ("""
-CREATE TABLE artists (
+CREATE TABLE IF NOT EXISTS artists (
     artist_id varchar(100) NOT NULL SORTKEY,
     name varchar(200) NOT NULL,
     location varchar(200),
@@ -120,7 +120,7 @@ DISTSTYLE ALL;
 # distkey (because we need to distribute it among various slices to perform parallel execution)
 # with DISTSTYLE set to Auto (let redshift decide which one is better optimization technique)
 time_table_create = ("""
-CREATE TABLE time (
+CREATE TABLE IF NOT EXISTS time (
     start_time timestamp NOT NULL DISTKEY,
     hour smallint NOT NULL,
     day smallint NOT NULL, 
@@ -137,66 +137,68 @@ staging_events_copy = ("""
 COPY staging_events FROM {}
 CREDENTIALS 'aws_iam_role={}'
 region 'us-east-2'
-json 'auto';
-""").format(config['S3']['SONG_DATA'], config['IAM_ROLE']['ARN'])
+format as JSON {}
+timeformat as 'epochmillisecs';
+""").format(config['S3']['LOG_DATA'], config['IAM_ROLE']['ARN'], config['S3']['LOG_JSONPATH'])
 
 staging_songs_copy = ("""
 COPY staging_songs FROM {}
 CREDENTIALS 'aws_iam_role={}'
 region 'us-east-2'
-format as JSON {}
-timeformat as 'epochmillisecs';
-""").format(config['S3']['LOG_DATA'], config['IAM_ROLE']['ARN'], config['S3']['LOG_JSONPATH'])
+json 'auto';
+""").format(config['S3']['SONG_DATA'], config['IAM_ROLE']['ARN'])
 
 # FINAL TABLES
 
 songplay_table_insert = ("""
 INSERT INTO songplays (
     start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
-SELECT to_timestamp(ts,'HH24:MI:SS'), user_id, level, song_id, artist_id, session_id, location, user_agent 
-FROM staging_songs as s
-LEFT OUTER JOIN staging_events as e
-ON s.song = e.title
-AND s.artist = e.artist_name
-AND s.length = e.duration
-WHERE s.page = 'NextSong';
+SELECT TIMESTAMP 'epoch' + ts/1000 *INTERVAL '1 second', user_id, level, song_id, artist_id, session_id, location, user_agent 
+FROM staging_events as events
+LEFT OUTER JOIN staging_songs as songs   
+ON events.song = songs.title
+AND events.artist = songs.artist_name
+AND events.length = songs.duration
+WHERE events.page = 'NextSong';
 """)
 
 user_table_insert = ("""
 INSERT INTO users (
     user_id, first_name, last_name, gender, level)
-SELECT user_id, first_name, last_name, gender, level 
-FROM staging_songs as s
-WHERE s.page = 'NextSong';
+SELECT DISTINCT user_id, first_name, last_name, gender, level 
+FROM staging_events as events
+WHERE events.page = 'NextSong';
 """)
 
 song_table_insert = ("""
 INSERT INTO songs (
     song_id, title, artist_id, year, duration) 
 SELECT song_id, title, artist_id, year, duration 
-FROM staging_events;
+FROM staging_songs;
 """)
 
 artist_table_insert = ("""
 INSERT INTO artists (
     artist_id, name, location, latitude, longitude) 
 SELECT artist_id, artist_name, artist_location, artist_latitude, artist_longitude
-FROM staging_events;
+FROM staging_songs;
 """)
 
 time_table_insert = ("""
 INSERT INTO time (
     start_time, hour, day, week, month, year, weekday)
-SELECT start_time,
-EXTRACT (hour FROM start_time),
-EXTRACT (day FROM start_time),
-EXTRACT (week FROM start_time),
-EXTRACT (month FROM start_time),
-EXTRACT (year FROM start_time),
-EXTRACT (weekday FROM start_time)
+SELECT 
+    start_time,
+    EXTRACT (hour FROM start_time),
+    EXTRACT (day FROM start_time),
+    EXTRACT (week FROM start_time),
+    EXTRACT (month FROM start_time),
+    EXTRACT (year FROM start_time),
+    EXTRACT (weekday FROM start_time)
 FROM (
-    SELECT distinct(to_timestamp(ts,'HH24:MI:SS')) as start_time FROM staging_songs as s
-    WHERE s.page = 'NextSong'
+    SELECT DISTINCT(TIMESTAMP 'epoch' + ts/1000 *INTERVAL '1 second') as start_time 
+    FROM staging_events as events
+    WHERE events.page = 'NextSong'
 );
 """)
 
