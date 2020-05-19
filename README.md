@@ -26,7 +26,8 @@ Dimension Tables:
 We have the following files in the etl process:
 1. create_tables.py: Used to execute the sql queries to create the tables in database
 2. sql_queries.py: Contains all the sql queries used to create tables and insert data to it.
-3. etl.py: ETL pipeline to execute the commands to redshift to extract data from S3, transform it and load it into target tables.
+3. etl.py: ETL pipeline to execute the commands to redshift to extract data from S3, 
+   transform it and load it into target tables.
 4. download_resources.py: To download the input files from internet.
 5. upload_resources.py: To upload the input files to S3 bucket.
 ```
