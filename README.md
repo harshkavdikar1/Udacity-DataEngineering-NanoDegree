@@ -11,7 +11,7 @@ We have the following star schema for our tables.
 Fact Table:
     Fact table stores the quantifiable metrics which can be aggreagted to get useful results.
     We have following fact table.
-    1. songplays - records in log data associated with song plays i.e. records with page NextSong
+    1. songplays - records in log data associated with song plays i.e. records with page = NextSong
 
 Dimension Tables:
     Dimension Tables stores the business events related to the facts. We have following dimension tables.
@@ -34,7 +34,7 @@ We have the following files in the etl process:
 ```
 pip install -r requirements.txt
 ```
-* Create tables in the database
+* Create tables in the database (Redshift)
 ```
 python create_tables.py
 ```
