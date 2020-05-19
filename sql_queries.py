@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS staging_songs (
 # To match with the table time we have start time as distkey
 songplay_table_create = ("""
 CREATE TABLE IF NOT EXISTS songplays (
-    songplay_id bigint IDENTITY(0,1),
+    songplay_id bigint IDENTITY(0,1) PRIMARY KEY,
     start_time timestamp NOT NULL,
     user_id varchar(10) NOT NULL,
     level varchar(10) NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS songplays (
 # performing analytics
 user_table_create = ("""
 CREATE TABLE IF NOT EXISTS users (
-    user_id varchar(10) NOT NULL SORTKEY,
+    user_id varchar(10) NOT NULL SORTKEY PRIMARY KEY,
     first_name varchar(200),
     last_name varchar(200),
     gender char(1),
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS users (
 # performing analytics
 song_table_create = ("""
 CREATE TABLE IF NOT EXISTS songs (
-    song_id varchar(100) NOT NULL SORTKEY,
+    song_id varchar(100) NOT NULL SORTKEY PRIMARY KEY,
     title varchar(100) NOT NULL,
     artist_id varchar(100) NOT NULL,
     year int NOT NULL,
@@ -106,7 +106,7 @@ DISTSTYLE ALL;
 # without distributing when performing analytics
 artist_table_create = ("""
 CREATE TABLE IF NOT EXISTS artists (
-    artist_id varchar(100) NOT NULL SORTKEY,
+    artist_id varchar(100) NOT NULL SORTKEY PRIMARY KEY,
     name varchar(200) NOT NULL,
     location varchar(200),
     latitude decimal,
@@ -121,7 +121,7 @@ DISTSTYLE ALL;
 # with DISTSTYLE set to Auto (let redshift decide which one is better optimization technique)
 time_table_create = ("""
 CREATE TABLE IF NOT EXISTS time (
-    start_time timestamp NOT NULL DISTKEY,
+    start_time timestamp NOT NULL DISTKEY PRIMARY KEY,
     hour smallint NOT NULL,
     day smallint NOT NULL, 
     week smallint NOT NULL,
@@ -153,7 +153,7 @@ json 'auto';
 songplay_table_insert = ("""
 INSERT INTO songplays (
     start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
-SELECT TIMESTAMP 'epoch' + ts/1000 *INTERVAL '1 second', user_id, level, song_id, artist_id, session_id, location, user_agent 
+SELECT DISTINCT TIMESTAMP 'epoch' + ts/1000 *INTERVAL '1 second', user_id, level, song_id, artist_id, session_id, location, user_agent 
 FROM staging_events as events
 LEFT OUTER JOIN staging_songs as songs   
 ON events.song = songs.title
@@ -173,14 +173,14 @@ WHERE events.page = 'NextSong';
 song_table_insert = ("""
 INSERT INTO songs (
     song_id, title, artist_id, year, duration) 
-SELECT song_id, title, artist_id, year, duration 
+SELECT DISTINCT song_id, title, artist_id, year, duration 
 FROM staging_songs;
 """)
 
 artist_table_insert = ("""
 INSERT INTO artists (
     artist_id, name, location, latitude, longitude) 
-SELECT artist_id, artist_name, artist_location, artist_latitude, artist_longitude
+SELECT DISTINCT artist_id, artist_name, artist_location, artist_latitude, artist_longitude
 FROM staging_songs;
 """)
 

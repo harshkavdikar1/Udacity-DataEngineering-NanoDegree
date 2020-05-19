@@ -15,7 +15,8 @@ def drop_tables(cur, conn):
         conn.commit()
 
 
-def create_tables(cur, conn):"""
+def create_tables(cur, conn):
+    """
     Drops each table using the queries in `create_table_queries` list.
     Args:
         cur: Cursor object to the database
