@@ -32,7 +32,7 @@ We have the following files in the etl process:
 ```
 
 ## ⚙  How to run your program
-* Install the dependencies 
+* Install the dependencies. 
 ```
 pip install -r requirements.txt
 ```
@@ -41,16 +41,16 @@ pip install -r requirements.txt
 ```
 python create_tables.py
 ```
-* Download resoucres for the project
+* Download resoucres for the project.
 ```
 python download_resources.py
 ```
-* Create a S3 bucket and IAM role with full access to it, modify the file with id and key and run below python script to 
-  upload the resources to the S3 bucket.
+* Create a S3 bucket and IAM role with full access to S3, modify the below file with aws_acces_id and aws_acces_key
+  and run below python script to upload the resources to the S3 bucket.
 ```
 python upload_resources.py
 ```
-* Execute the ETL pipeline
+* Run the ETL pipeline.
 ```
 python etl.py
 ```
