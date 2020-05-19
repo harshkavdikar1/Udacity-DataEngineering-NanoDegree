@@ -17,7 +17,7 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 
 # CREATE TABLES
 
-staging_events_table_create= ("""
+staging_events_table_create = ("""
 CREATE TABLE IF NOT EXISTS staging_events (
     artist varchar(200),
     auth varchar(20),
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS songplays (
 
 
 # Users table has very less records as compared to songplays table that's why we can have user_id
-# as SORTKEY and DISTTYLE as ALL, we want it to be loaded to all slices without distributing when 
+# as SORTKEY and DISTTYLE as ALL, we want it to be loaded to all slices without distributing when
 # performing analytics
 user_table_create = ("""
 CREATE TABLE IF NOT EXISTS users (
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 
 # Songs table has very less records as compared to songplays table that's why we can have song_id
-# as SORTKEY and DISTTYLE as ALL, we want it to be loaded to all slices without distributing when 
+# as SORTKEY and DISTTYLE as ALL, we want it to be loaded to all slices without distributing when
 # performing analytics
 song_table_create = ("""
 CREATE TABLE IF NOT EXISTS songs (
@@ -102,7 +102,7 @@ DISTSTYLE ALL;
 
 
 # Since the number of artists as compared to songs and song play tables will be very less
-# we have artist_id as SORTKEY with DISTSTYLE as ALL, we want it to be loaded to all slices 
+# we have artist_id as SORTKEY with DISTSTYLE as ALL, we want it to be loaded to all slices
 # without distributing when performing analytics
 artist_table_create = ("""
 CREATE TABLE IF NOT EXISTS artists (
@@ -116,7 +116,7 @@ DISTSTYLE ALL;
 """)
 
 
-# The time table has same records as songplays table that's why we have start time as sortkey and 
+# The time table has same records as songplays table that's why we have start time as sortkey and
 # distkey (because we need to distribute it among various slices to perform parallel execution)
 # with DISTSTYLE set to Auto (let redshift decide which one is better optimization technique)
 time_table_create = ("""
@@ -204,7 +204,10 @@ FROM (
 
 # QUERY LISTS
 
-create_table_queries = [staging_events_table_create, staging_songs_table_create, songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
-drop_table_queries = [staging_events_table_drop, staging_songs_table_drop, songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
+create_table_queries = [staging_events_table_create, staging_songs_table_create,
+                        songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
+drop_table_queries = [staging_events_table_drop, staging_songs_table_drop,
+                      songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
 copy_table_queries = [staging_events_copy, staging_songs_copy]
-insert_table_queries = [songplay_table_insert, user_table_insert, song_table_insert, artist_table_insert, time_table_insert]
+insert_table_queries = [songplay_table_insert, user_table_insert,
+                        song_table_insert, artist_table_insert, time_table_insert]
