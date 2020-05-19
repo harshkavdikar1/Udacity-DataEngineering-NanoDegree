@@ -3,6 +3,12 @@ import os
 
 
 def upload_file_to_s3(path, s3):
+    """
+    Upload all the files in the sub-directories to the s3 bucket
+    Args:
+        path : local path to the main directory
+        s3 : sdk object to interact with s3 bucket
+    """
     for path, directory, files in os.walk(path):
         for f in files:
             file_path = path + "\\" + f
