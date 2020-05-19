@@ -36,7 +36,8 @@ We have the following files in the etl process:
 ```
 pip install -r requirements.txt
 ```
-* Create tables in the database (Redshift)
+* Create an IAM role for redshift with read only access to S3 then create a redshift cluster and update the conf 
+  file with parameters, then execute follwing python script to create tables in redshift.
 ```
 python create_tables.py
 ```
@@ -44,7 +45,8 @@ python create_tables.py
 ```
 python download_resources.py
 ```
-* Upload the resources to the S#
+* Create a S3 bucket and IAM role with full access to it, modify the file with id and key and run below python script to 
+  upload the resources to the S3 bucket.
 ```
 python upload_resources.py
 ```
