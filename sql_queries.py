@@ -9,7 +9,7 @@ config.read('dwh.cfg')
 
 staging_events_table_drop = "DROP TABLE IF EXISTS staging_events"
 staging_songs_table_drop = "DROP TABLE IF EXISTS staging_songs"
-songplay_table_drop = "DROP TABLE IF EXISTS songplay"
+songplay_table_drop = "DROP TABLE IF EXISTS songplays"
 user_table_drop = "DROP TABLE IF EXISTS users"
 song_table_drop = "DROP TABLE IF EXISTS songs"
 artist_table_drop = "DROP TABLE IF EXISTS artists"
@@ -21,13 +21,13 @@ staging_events_table_create= ("""
 CREATE TABLE staging_events (
     num_songs int,
     artist_id varchar(100),
-    artist_latitude varchar(10),
-    artist_longitude varchar(10),
+    artist_latitude decimal,
+    artist_longitude decimal,
     artist_location varchar(200),
     artist_name varchar(200),
     song_id varchar(100),
     title varchar(100),
-    duration float,
+    duration decimal,
     year int
 );    
 """)
@@ -40,14 +40,14 @@ CREATE TABLE staging_songs (
     gender char(1),
     item_in_session int,
     last_name varchar(200),
-    length float,
+    length decimal,
     level varchar(10),
     location varchar(200),
     method varchar(10),
     page varchar(100),
     registration varchar(20),
     session_id int,
-    song varchar(100),
+    song varchar(200),
     status smallint,
     ts timestamp,
     user_agent varchar(200),
@@ -59,15 +59,15 @@ CREATE TABLE staging_songs (
 # To match with the table time we have start time as distkey
 songplay_table_create = ("""
 CREATE TABLE songplays (
-    songplay_id IDENTITY(0,1),
-    start_time timestamp NOT NULL DISTKEY,
+    songplay_id bigint IDENTITY(0,1),
+    start_time timestamp NOT NULL,
     user_id varchar(10) NOT NULL,
     level varchar(10) NOT NULL,
-    song_id varchar(100) NOT NULL,
-    artist_id varchar(100) NOT NULL,
+    song_id varchar(100),
+    artist_id varchar(100),
     session_id int NOT NULL,
-    location varchar(200) NOT NULL,
-    user_agent varchar(200) NOT NULL
+    location varchar(200),
+    user_agent varchar(200)
 );
 """)
 
@@ -78,9 +78,9 @@ CREATE TABLE songplays (
 user_table_create = ("""
 CREATE TABLE users (
     user_id varchar(10) NOT NULL SORTKEY,
-    first_name varchar(200) NOT NULL,
-    last_name varchar(200) NOT NULL,
-    gender char(1) NOT NULL,
+    first_name varchar(200),
+    last_name varchar(200),
+    gender char(1),
     level varchar(10) NOT NULL
 );
 """)
@@ -95,7 +95,7 @@ CREATE TABLE songs (
     title varchar(100) NOT NULL,
     artist_id varchar(100) NOT NULL,
     year int NOT NULL,
-    duration float NOT NULL
+    duration decimal NOT NULL
 )
 DISTSTYLE ALL;
 """)
@@ -109,8 +109,8 @@ CREATE TABLE artists (
     artist_id varchar(100) NOT NULL SORTKEY,
     name varchar(200) NOT NULL,
     location varchar(200),
-    latitude varchar(20),
-    longitude varchar(20),
+    latitude decimal,
+    longitude decimal
 )
 DISTSTYLE ALL;
 """)
@@ -121,15 +121,14 @@ DISTSTYLE ALL;
 # with DISTSTYLE set to Auto (let redshift decide which one is better optimization technique)
 time_table_create = ("""
 CREATE TABLE time (
-    start_time timestamp NOT NULL SORTKEY DISTKEY,
+    start_time timestamp NOT NULL DISTKEY,
     hour smallint NOT NULL,
     day smallint NOT NULL, 
     week smallint NOT NULL,
     month smallint NOT NULL,
     year int NOT NULL,
-    weekday int NOT NULL
-)
-DISTSTYLE AUTO;
+    weekday varchar(10) NOT NULL
+);
 """)
 
 # STAGING TABLES
@@ -137,28 +136,29 @@ DISTSTYLE AUTO;
 staging_events_copy = ("""
 COPY staging_events FROM {}
 CREDENTIALS 'aws_iam_role={}'
-region 'us-west-2';
-""").format(config['S3']['LOG_DATA'], config['IAM_ROLE']['ARN'])
+region 'us-east-2'
+json 'auto';
+""").format(config['S3']['SONG_DATA'], config['IAM_ROLE']['ARN'])
 
 staging_songs_copy = ("""
 COPY staging_songs FROM {}
 CREDENTIALS 'aws_iam_role={}'
-region 'us-west-2';
+region 'us-east-2'
 format as JSON {}
-timeformat as 'epochmillisecs'
-""").format(config['S3']['SONG_DATA'], config['IAM_ROLE']['ARN'], config['S3']['LOG_JSONPATH'])
+timeformat as 'epochmillisecs';
+""").format(config['S3']['LOG_DATA'], config['IAM_ROLE']['ARN'], config['S3']['LOG_JSONPATH'])
 
 # FINAL TABLES
 
 songplay_table_insert = ("""
 INSERT INTO songplays (
     start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
-SELECT to_timestamp(ts), user_id, level, song_id, artist_id, session_id, location, user_agent 
+SELECT to_timestamp(ts,'HH24:MI:SS'), user_id, level, song_id, artist_id, session_id, location, user_agent 
 FROM staging_songs s
 LEFT OUTER JOIN staging_events e
 ON e.title = s.song 
-AND e.name = s.artist 
-AND e.duration = s.length
+AND e.artist_name = s.artist 
+AND e.duration = s.length;
 """)
 
 user_table_insert = ("""
@@ -178,7 +178,7 @@ FROM staging_events;
 artist_table_insert = ("""
 INSERT INTO artists (
     artist_id, name, location, latitude, longitude) 
-SELECT artist_id, artist_name, artist_location, artist_latitude, artist_location
+SELECT artist_id, artist_name, artist_location, artist_latitude, artist_longitude
 FROM staging_events;
 """)
 
@@ -191,10 +191,10 @@ EXTRACT (day FROM start_time),
 EXTRACT (week FROM start_time),
 EXTRACT (month FROM start_time),
 EXTRACT (year FROM start_time),
-EXTRACT (dow FROM start_time)
+EXTRACT (weekday FROM start_time)
 FROM (
-    SELECT to_timestamp(ts) as start_time FROM staging_events
-)
+    SELECT to_timestamp(ts,'HH24:MI:SS') as start_time FROM staging_songs
+);
 """)
 
 # QUERY LISTS
