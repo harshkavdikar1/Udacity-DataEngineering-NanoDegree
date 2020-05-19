@@ -1,4 +1,4 @@
-# DataWarehouse ON AWS
+# Data Warehouse ON AWS
 ```
 In this project we are creating an ETL pipeline to create and popuate the star schema with data
 in Postgres to optimize the data analytics for Sparkify. The data is present in S3 in series of
