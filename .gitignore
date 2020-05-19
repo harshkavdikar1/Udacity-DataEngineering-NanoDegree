@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+log-data/
+song-data/
+log_json_path.json
+feed.xml
