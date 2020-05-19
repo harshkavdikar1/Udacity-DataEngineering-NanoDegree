@@ -154,18 +154,20 @@ songplay_table_insert = ("""
 INSERT INTO songplays (
     start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
 SELECT to_timestamp(ts,'HH24:MI:SS'), user_id, level, song_id, artist_id, session_id, location, user_agent 
-FROM staging_songs s
-LEFT OUTER JOIN staging_events e
-ON e.title = s.song 
-AND e.artist_name = s.artist 
-AND e.duration = s.length;
+FROM staging_songs as s
+LEFT OUTER JOIN staging_events as e
+ON s.song = e.title
+AND s.artist = e.artist_name
+AND s.length = e.duration
+WHERE s.page = 'NextSong';
 """)
 
 user_table_insert = ("""
 INSERT INTO users (
     user_id, first_name, last_name, gender, level)
 SELECT user_id, first_name, last_name, gender, level 
-FROM staging_songs;
+FROM staging_songs as s
+WHERE s.page = 'NextSong';
 """)
 
 song_table_insert = ("""
@@ -193,7 +195,8 @@ EXTRACT (month FROM start_time),
 EXTRACT (year FROM start_time),
 EXTRACT (weekday FROM start_time)
 FROM (
-    SELECT to_timestamp(ts,'HH24:MI:SS') as start_time FROM staging_songs
+    SELECT distinct(to_timestamp(ts,'HH24:MI:SS')) as start_time FROM staging_songs as s
+    WHERE s.page = 'NextSong'
 );
 """)
 
