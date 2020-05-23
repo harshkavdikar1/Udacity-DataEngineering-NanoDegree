@@ -23,8 +23,11 @@ def create_spark_session():
 
 def process_song_data(spark, input_data, output_data):
     """
-    
-
+    extract songs data from input json files, transform it and load it to s3
+    Args:
+        spark : object of spark context
+        input_data : path of input_data stored in s3
+        output_data : path where output files need to be stored
     """
 
     # get filepath to song data file
@@ -47,6 +50,13 @@ def process_song_data(spark, input_data, output_data):
 
 
 def process_log_data(spark, input_data, output_data):
+    """
+    extract songs data from input json files, transform it and load it to s3
+    Args:
+        spark : object of spark context
+        input_data : path of input_data stored in s3
+        output_data : path where output files need to be stored
+    """
     # get filepath to log data file
     log_data =
 
