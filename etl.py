@@ -22,6 +22,11 @@ def create_spark_session():
 
 
 def process_song_data(spark, input_data, output_data):
+    """
+    
+
+    """
+
     # get filepath to song data file
     song_data = 
     
@@ -82,6 +87,17 @@ def process_log_data(spark, input_data, output_data):
 
 
 def main():
+    """
+    Extract the source data from s3
+
+    Transform the data using spark to create star schema
+
+    Create fact table - songplays
+
+    Create dimention tables - songs, time, artists, users
+
+    Load the data back to s3 in parquet format
+    """
     spark = create_spark_session()
     input_data = "s3a://udacity-dend/"
     output_data = ""
