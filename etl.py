@@ -9,8 +9,9 @@ from pyspark.sql.functions import year, month, dayofmonth, hour, weekofyear, dat
 config = configparser.ConfigParser()
 config.read('dl.cfg')
 
-os.environ['AWS_ACCESS_KEY_ID']=config['AWS_ACCESS_KEY_ID']
-os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS_SECRET_ACCESS_KEY']
+os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['AWS_ACCESS_KEY_ID']
+os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['AWS_SECRET_ACCESS_KEY']
+os.environ['PYSPARK_SUBMIT_ARGS'] = "--packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2 pyspark-shell"
 
 
 def create_spark_session():
@@ -36,8 +37,8 @@ def process_song_data(spark, input_data, output_data):
     """
 
     # get filepath to song data file
-    song_data = 
-    
+    song_data = input_data + "/song-data/*/*/*/*.json"
+
     # read song data file
     df = 
 
@@ -63,7 +64,7 @@ def process_log_data(spark, input_data, output_data):
         output_data : path where output files need to be stored
     """
     # get filepath to log data file
-    log_data =
+    log_data = 
 
     # read log data file
     df = 
@@ -114,9 +115,12 @@ def main():
     Load the data back to s3 in parquet format
     """
     spark = create_spark_session()
-    input_data = "s3a://udacity-dend/"
-    output_data = ""
-    
+
+    input_data = "s3a://udacitydenanodegree2020/"
+    output_data = "s3a://udacitydenanodegree2020/output/"
+    input_data = "data"
+    output_data = "data"
+
     process_song_data(spark, input_data, output_data)    
     process_log_data(spark, input_data, output_data)
 
