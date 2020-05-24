@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+songs.parquet
+artists.parquet
+users.parquet
+time.parquet
+songplays.parquet
+
+data/
