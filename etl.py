@@ -1,16 +1,17 @@
-import configparser
 from datetime import datetime
 import os
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
-
+# Comment out these lines when running code on EMR cluster
+# AWS credentials should be present int credentials file
+# under .aws directory present at home 
+import configparser
 config = configparser.ConfigParser()
 config.read('dl.cfg')
 
 os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['AWS_ACCESS_KEY_ID']
 os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['AWS_SECRET_ACCESS_KEY']
-# os.environ['PYSPARK_SUBMIT_ARGS'] = "--packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2 pyspark-shell"
 
 
 def create_spark_session():
