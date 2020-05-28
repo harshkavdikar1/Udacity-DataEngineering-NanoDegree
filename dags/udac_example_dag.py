@@ -38,9 +38,10 @@ stage_events_to_redshift = StageToRedshiftOperator(
     table_name="staging_events",
     s3_bucket="udacitydenanodegree2020",
     s3_key="log-data",
+    file_format="JSON",
+    log_json_file = "log_json_path.json",
     redshift_conn_id="redshift",
     aws_credentials_id="aws_credentials",
-    file_format="JSON",
     dag=dag
 )
 
