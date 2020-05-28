@@ -27,6 +27,12 @@ dag = DAG('udac_example_dag',
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
 
+create_tables_in_redshift = CreateTableOperator(
+    task_id='create_tables_in_redshift',
+    redshift_conn_id='redshift',
+    dag=dag
+)
+
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
     table_name="staging_events",
@@ -102,10 +108,12 @@ run_quality_checks = DataQualityOperator(
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
 
+# Step 0
+start_operator >> create_tables_in_redshift
 
 # Step 1
-start_operator >> [stage_events_to_redshift,
-                   stage_songs_to_redshift] >> load_songplays_table
+create_tables_in_redshift >> [stage_events_to_redshift,
+                              stage_songs_to_redshift] >> load_songplays_table
 
 # Step 2
 load_songplays_table >> [load_song_dimension_table, load_user_dimension_table,
