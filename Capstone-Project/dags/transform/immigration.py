@@ -10,7 +10,7 @@ spark = SparkSession.builder.\
 # df_spark = spark.read.format("com.github.saurfang.sas.spark")\
 #     .load("../../data/18-83510-I94-Data-2016/i94_apr16_sub.sas7bdat")
 
-df_spark = spark.read.parquet("input data/*.parquet")
+df_spark = spark.read.parquet("C:/Users/Hp-pc/Downloads/Data Engineering Nano Degree/Capstone Project/sas_data/*.parquet")
 
 mapping_visa_mode = {1: "Business", 2: "Pleasure", 3: "Student"}
 mapping_arrival_mode = {1: 'Air', 2: 'Sea', 3: 'Land', 9: 'Not reported'}
