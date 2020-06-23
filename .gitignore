@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 
 staging_data/
+
+source_data/
