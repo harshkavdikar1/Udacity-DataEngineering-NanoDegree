@@ -2,9 +2,9 @@
 
 Projects and resources developed in the [DEND Nanodegree](https://www.udacity.com/course/data-engineer-nanodegree--nd027) from Udacity.
 
-## Project 1: [Relational Databases - Data Modeling with PostgreSQL](https://github.com/danieldiamond/udacity-dend/tree/master/relational_db_modeling_postgresql)
+## Project 1: [Relational Databases - Data Modeling with PostgreSQL](https://github.com/harshkavdikar1/Udacity-DataEngineering-NanoDegree/tree/master/Data-Modeling-With-Postgres)
 
-<p align="center"><img src="https://raw.githubusercontent.com/danieldiamond/udacity-dend/master/relational_db_modeling_postgresql/images/logo.png" style="height: 100%; width: 100%; max-width: 200px" /></p>
+<p align="center"><img src="https://github.com/harshkavdikar1/Udacity-DataEngineering-NanoDegree/blob/master/Images/postgres_logo.png" style="height: 100%; width: 100%; max-width: 200px" /></p>
 
 Developed a relational database using PostgreSQL to model user activity data for a music streaming app. Skills include:
 * Created a relational database using PostgreSQL
@@ -14,9 +14,9 @@ Developed a relational database using PostgreSQL to model user activity data for
 Proficiencies include: Python, PostgreSql, Star-Schema, ETL pipelines, Normalization, Denormalization
 
 
-## Project 2: [NoSQL Databases - Data Modeling with Apache Cassandra](https://github.com/danieldiamond/udacity-dend/tree/master/nosql_db_modeling_apache_cassandra)
+## Project 2: [NoSQL Databases - Data Modeling with Apache Cassandra](https://github.com/harshkavdikar1/Udacity-DataEngineering-NanoDegree/tree/master/Data-Modeling-With-Cassandra)
 
-<p align="center"><img src="https://raw.githubusercontent.com/danieldiamond/udacity-dend/master/nosql_db_modeling_apache_cassandra/images/logo.png" style="height: 100%; width: 100%; max-width: 200px" /></p>
+<p align="center"><img src="https://github.com/harshkavdikar1/Udacity-DataEngineering-NanoDegree/blob/master/Images/cassandra_logo.png" style="height: 100%; width: 100%; max-width: 200px" /></p>
 
 Designed a NoSQL database using Apache Cassandra based on the original schema outlined in project one. Skills include:
 * Created a nosql database using Apache Cassandra (both locally and with docker containers)
@@ -25,9 +25,9 @@ Designed a NoSQL database using Apache Cassandra based on the original schema ou
 Proficiencies used: Python, Apache Cassandra, Denormalization
 
 
-## Project 3: [Data Warehouse - Amazon Redshift](https://github.com/danieldiamond/udacity-dend/tree/master/data_warehouse_redshift)
+## Project 3: [Data Warehouse - Amazon Redshift](https://github.com/harshkavdikar1/Udacity-DataEngineering-NanoDegree/tree/master/Data-Warehouse-ON-AWS)
 
-<p align="center"><img src="https://raw.githubusercontent.com/danieldiamond/udacity-dend/master/data_warehouse_redshift/images/logo.png" style="height: 100%; width: 100%; max-width: 200px" /></p>
+<p align="center"><img src="https://github.com/harshkavdikar1/Udacity-DataEngineering-NanoDegree/blob/master/Images/redshift_logo.png" style="height: 100%; width: 100%; max-width: 200px" /></p>
 
 Created a database warehouse utilizing Amazon Redshift. Skills include:
 * Creating a Redshift Cluster, IAM Roles, Security groups.
@@ -36,9 +36,9 @@ Created a database warehouse utilizing Amazon Redshift. Skills include:
 
 Proficiencies used: Python, Amazon Redshift, AWS S3, Amazon SDK (boto3), PostgreSQL, AWS IAM
 
-## Project 4: [Data Lake - Spark](https://github.com/danieldiamond/udacity-dend/tree/master/data_lake_spark)
+## Project 4: [Data Lake - Spark](https://github.com/harshkavdikar1/Udacity-DataEngineering-NanoDegree/tree/master/Data-Lake-With-Spark)
 
-<p align="center"><img src="https://raw.githubusercontent.com/danieldiamond/udacity-dend/master/data_lake_spark/images/logo.png" style="height: 100%; width: 100%; max-width: 200px" /></p>
+<p align="center"><img src="https://github.com/harshkavdikar1/Udacity-DataEngineering-NanoDegree/blob/master/Images/spark_logo.png" style="height: 100%; width: 100%; max-width: 200px" /></p>
 
 Scaled up the current ETL pipeline by moving the data warehouse to a data lake. Skills include:
 * Create an EMR Hadoop Cluster
@@ -47,9 +47,9 @@ Scaled up the current ETL pipeline by moving the data warehouse to a data lake. 
 
 Technologies used: Spark(pyspark), S3, AWS EMR, Python, Data Lakes.
 
-## Project 5: [Data Pipelines - Airflow](https://github.com/danieldiamond/udacity-dend/tree/master/data_pipelines_airflow)
+## Project 5: [Data Pipelines - Airflow](https://github.com/harshkavdikar1/Udacity-DataEngineering-NanoDegree/tree/master/Data-Pipelines-with-Apache-Airflow)
 
-<p align="center"><img src="https://raw.githubusercontent.com/danieldiamond/udacity-dend/master/data_pipelines_airflow/images/logo.png" style="height: 100%; width: 100%; max-width: 200px" /></p>
+<p align="center"><img src="https://github.com/harshkavdikar1/Udacity-DataEngineering-NanoDegree/blob/master/Images/airflow_logo.png" style="height: 100%; width: 100%; max-width: 200px" /></p>
 
 Automate the ETL pipeline and creation of data warehouse using Apache Airflow. Skills include:
 * Using Airflow to automate ETL pipelines using Airflow, Python, Amazon Redshift.
